@@ -10,6 +10,8 @@ import {
   ScrollText,
   Ticket,
   IdCard,
+  Inbox,
+  MessageCircle,
 } from "lucide-react";
 import type { NavItem } from "@/types/nav";
 
@@ -43,6 +45,16 @@ export const itNavItems: NavItem[] = [
     label: "Content",
     href: "/it/content",
     icon: Newspaper,
+  },
+  {
+    label: "Mailbox",
+    href: "/it/mailbox",
+    icon: Inbox,
+  },
+  {
+    label: "Messages",
+    href: "/it/messages",
+    icon: MessageCircle,
   },
   {
     label: "System Settings",
@@ -83,6 +95,16 @@ export const adminNavItems: NavItem[] = [
     href: "/admin/users",
     icon: Users,
   },
+  {
+    label: "Mailbox",
+    href: "/admin/mailbox",
+    icon: Inbox,
+  },
+  {
+    label: "Messages",
+    href: "/admin/messages",
+    icon: MessageCircle,
+  },
 ];
 
 export const memberNavItems: NavItem[] = [
@@ -107,8 +129,61 @@ export const memberNavItems: NavItem[] = [
     icon: FileBadge2,
   },
   {
+    label: "Mailbox",
+    href: "/member/mailbox",
+    icon: Inbox,
+  },
+  {
+    label: "Messages",
+    href: "/member/messages",
+    icon: MessageCircle,
+  },
+  {
     label: "Profile",
     href: "/member/profile",
+    icon: IdCard,
+  },
+];
+
+export const executiveNavItems: NavItem[] = [
+  {
+    label: "Dashboard",
+    href: "/executive",
+    icon: LayoutDashboard,
+  },
+  {
+    label: "Events I manage",
+    href: "/executive/events",
+    icon: CalendarDays,
+  },
+  {
+    label: "My teams",
+    href: "/executive/teams",
+    icon: Users,
+  },
+  {
+    label: "Tasks",
+    href: "/executive/tasks",
+    icon: ScrollText,
+  },
+  {
+    label: "Certificates",
+    href: "/executive/certificates",
+    icon: FileBadge2,
+  },
+  {
+    label: "Mailbox",
+    href: "/executive/mailbox",
+    icon: Inbox,
+  },
+  {
+    label: "Messages",
+    href: "/executive/messages",
+    icon: MessageCircle,
+  },
+  {
+    label: "Profile",
+    href: "/executive/profile",
     icon: IdCard,
   },
 ];
