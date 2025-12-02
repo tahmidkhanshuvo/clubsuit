@@ -8,6 +8,8 @@ import {
   Settings2,
   Newspaper,
   ScrollText,
+  Ticket,
+  IdCard,
 } from "lucide-react";
 import type { NavItem } from "@/types/nav";
 
@@ -80,5 +82,33 @@ export const adminNavItems: NavItem[] = [
     label: "Users",
     href: "/admin/users",
     icon: Users,
+  },
+];
+
+export const memberNavItems: NavItem[] = [
+  {
+    label: "Dashboard",
+    href: "/member",
+    icon: LayoutDashboard,
+  },
+  {
+    label: "Events",
+    href: "/member/events",
+    icon: CalendarDays,
+  },
+  {
+    label: "My registrations",
+    href: "/member/registrations",
+    icon: Ticket,
+  },
+  {
+    label: "Certificates",
+    href: "/member/certificates",
+    icon: FileBadge2,
+  },
+  {
+    label: "Profile",
+    href: "/member/profile",
+    icon: IdCard,
   },
 ];
