@@ -2,6 +2,7 @@
 "use client";
 
 import { useMemo, useState, ChangeEvent } from "react";
+import Link from "next/link";
 import {
   SimpleTable,
   SimpleTableRow,
@@ -28,8 +29,8 @@ type UsersTableProps = {
   users: UserRecord[];
   /**
    * Controls which actions are visible.
-   * - "it": can see Reset password.
-   * - "admin": no Reset password.
+   * - "it": can see Reset password, links to /it/users/[id]
+   * - "admin": no Reset password, links to /admin/users/[id]
    */
   variant?: "it" | "admin";
 };
@@ -109,6 +110,7 @@ export function UsersTable({ users, variant = "it" }: UsersTableProps) {
   const total = users.length;
   const filteredCount = filteredUsers.length;
   const showResetPassword = variant === "it";
+  const detailsBasePath = variant === "it" ? "/it/users" : "/admin/users";
 
   function handleSearchChange(e: ChangeEvent<HTMLInputElement>) {
     setSearch(e.target.value);
@@ -229,15 +231,20 @@ export function UsersTable({ users, variant = "it" }: UsersTableProps) {
 
               <SimpleTableCell className="text-right">
                 <div className="flex justify-end gap-2">
-                  {/* Details always available */}
-                  <Button
-                    variant="ghost"
-                    className="h-7 px-2 text-[11px]"
+                  {/* Details links to /it/users/[id] or /admin/users/[id] */}
+                  <Link
+                    href={`${detailsBasePath}/${user.id}`}
+                    className="inline-flex"
                   >
-                    Details
-                  </Button>
+                    <Button
+                      variant="ghost"
+                      className="h-7 px-2 text-[11px]"
+                    >
+                      Details
+                    </Button>
+                  </Link>
 
-                  {/* Verify / Ban / Unban – wired later */}
+                  {/* Verify / Ban / Unban – wired later to backend */}
                   {user.status === "pending" && (
                     <Button
                       variant="outline"

@@ -6,6 +6,7 @@ import {
   type PanelRecord,
   type TeamRecord,
 } from "@/features/panels/components/PanelsTeamsOverview";
+import { PanelsStructureEditor } from "@/features/panels/components/PanelsStructureEditor";
 
 const demoPanels: PanelRecord[] = [
   {
@@ -32,24 +33,27 @@ const demoTeams: TeamRecord[] = [
     name: "RnD Team",
     members: 28,
     status: "active",
-    lead: "GS – General Secretary",
-    keyRoles: ["GS", "SSE", "SE"],
+    lead: "General Secretary (GS)",
+    keyRoles: ["General Secretary (GS)", "Senior Executive (SSE)", "Executive (SE)"],
+    panelId: "panel-2025",
   },
   {
     id: "team-msm",
     name: "Media & Social Media Team",
     members: 18,
     status: "active",
-    lead: "VP – Vice President",
-    keyRoles: ["VP", "Coordinator", "Designer"],
+    lead: "Vice President (VP)",
+    keyRoles: ["Vice President (VP)", "Executive (SE)", "Volunteer"],
+    panelId: "panel-2025",
   },
   {
     id: "team-ops",
     name: "Operations & Logistics Team",
     members: 16,
     status: "inactive",
-    lead: "SE – Senior Executive",
-    keyRoles: ["SE", "Exec", "Volunteer"],
+    lead: "Senior Executive (SSE)",
+    keyRoles: ["Senior Executive (SSE)", "Executive (SE)", "Volunteer"],
+    panelId: "panel-2024",
   },
 ];
 
@@ -58,10 +62,10 @@ export function ItPanelsPage() {
     <div className="space-y-6">
       <PageHeader
         title="Panels & Teams"
-        description="Keep the AUSTRC hierarchy clean: panels, executive roles, and functional teams."
+        description="Keep the AUSTRC hierarchy clean: executive panels and functional teams."
         actions={
           <Button variant="outline" disabled>
-            Edit structure (coming soon)
+            Backend integration (soon)
           </Button>
         }
       />
@@ -69,6 +73,12 @@ export function ItPanelsPage() {
       <PanelsTeamsOverview
         panels={demoPanels}
         teams={demoTeams}
+        variant="it"
+      />
+
+      <PanelsStructureEditor
+        initialPanels={demoPanels}
+        initialTeams={demoTeams}
         variant="it"
       />
     </div>

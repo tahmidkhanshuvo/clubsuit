@@ -6,8 +6,9 @@ import {
   type PanelRecord,
   type TeamRecord,
 } from "@/features/panels/components/PanelsTeamsOverview";
+import { PanelsStructureEditor } from "@/features/panels/components/PanelsStructureEditor";
 
-const demoPanels: PanelRecord[] = [
+const adminPanelsDemo: PanelRecord[] = [
   {
     id: "panel-2025",
     name: "Executive Panel 2025",
@@ -26,30 +27,41 @@ const demoPanels: PanelRecord[] = [
   },
 ];
 
-const demoTeams: TeamRecord[] = [
+const adminTeamsDemo: TeamRecord[] = [
+  {
+    id: "team-events",
+    name: "Events & Operations Team",
+    members: 22,
+    status: "active",
+    lead: "General Secretary (GS)",
+    keyRoles: ["General Secretary (GS)", "Vice President (VP)", "Senior Executive (SSE)", "Executive (SE)"],
+    panelId: "panel-2025",
+  },
   {
     id: "team-rnd",
     name: "RnD Team",
-    members: 28,
-    status: "active",
-    lead: "GS – General Secretary",
-    keyRoles: ["GS", "SSE", "SE"],
-  },
-  {
-    id: "team-msm",
-    name: "Media & Social Media Team",
     members: 18,
     status: "active",
-    lead: "VP – Vice President",
-    keyRoles: ["VP", "Coordinator", "Designer"],
+    lead: "Vice President (VP)",
+    keyRoles: ["Vice President (VP)", "Senior Executive (SSE)", "Executive (SE)"],
+    panelId: "panel-2025",
   },
   {
-    id: "team-ops",
-    name: "Operations & Logistics Team",
-    members: 16,
+    id: "team-media",
+    name: "Media & Social Media Team",
+    members: 15,
+    status: "active",
+    lead: "Senior Executive (SSE)",
+    keyRoles: ["Senior Executive (SSE)", "Executive (SE)", "Volunteer"],
+    panelId: "panel-2024",
+  },
+  {
+    id: "team-alumni",
+    name: "Alumni Relations Team",
+    members: 10,
     status: "inactive",
-    lead: "SE – Senior Executive",
-    keyRoles: ["SE", "Exec", "Volunteer"],
+    lead: "Executive (SE)",
+    keyRoles: ["Executive (SE)", "Volunteer"],
   },
 ];
 
@@ -58,17 +70,23 @@ export function AdminPanelsPage() {
     <div className="space-y-6">
       <PageHeader
         title="Panels & Teams"
-        description="Keep the AUSTRC hierarchy clean: panels, executive roles, and functional teams."
+        description="See how members are organized into panels and teams for club operations."
         actions={
           <Button variant="outline" disabled>
-            Edit structure (coming soon)
+            Backend integration (soon)
           </Button>
         }
       />
 
       <PanelsTeamsOverview
-        panels={demoPanels}
-        teams={demoTeams}
+        panels={adminPanelsDemo}
+        teams={adminTeamsDemo}
+        variant="admin"
+      />
+
+      <PanelsStructureEditor
+        initialPanels={adminPanelsDemo}
+        initialTeams={adminTeamsDemo}
         variant="admin"
       />
     </div>

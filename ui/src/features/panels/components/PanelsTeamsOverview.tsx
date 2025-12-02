@@ -29,6 +29,7 @@ export type TeamRecord = {
   status: TeamStatus;
   lead?: string;
   keyRoles?: string[]; // e.g. ["GS", "VP", "SE", "SSE"]
+  panelId?: string; // which panel this team belongs to (optional)
 };
 
 type PanelsTeamsOverviewProps = {
@@ -36,7 +37,6 @@ type PanelsTeamsOverviewProps = {
   teams: TeamRecord[];
   /**
    * "it" | "admin" – both can edit structure eventually.
-   * Variant is here in case we want to differ later.
    */
   variant?: "it" | "admin";
 };
