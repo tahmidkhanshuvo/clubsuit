@@ -1,0 +1,113 @@
+# -----------------------------
+# OS / System files
+# -----------------------------
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+desktop.ini
+
+# -----------------------------
+# Node / Bun / package managers
+# -----------------------------
+node_modules/
+bun.lockb
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# -----------------------------
+# Next.js / React build output
+# (applies inside ui/ and future apps)
+# -----------------------------
+.next/
+out/
+.turbo/
+.vercel/
+
+# If you ever build a static export
+export/
+
+# -----------------------------
+# Build / dist / coverage
+# -----------------------------
+dist/
+build/
+coverage/
+*.lcov
+
+# -----------------------------
+# Environment / secrets
+# (keep examples tracked manually)
+# -----------------------------
+.env
+.env.*
+!.env.example
+
+# Sometimes people keep envs per app
+ui/.env
+ui/.env.*
+api/.env
+api/.env.*
+
+# -----------------------------
+# Logs
+# -----------------------------
+logs/
+*.log
+logs/*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# -----------------------------
+# Editor / IDE / tooling
+# -----------------------------
+.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+.idea/
+*.iml
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.swp
+*.swo
+
+# -----------------------------
+# Mac / Linux / misc
+# -----------------------------
+*.orig
+*.rej
+
+# -----------------------------
+# API / backend specific (future-safe)
+# -----------------------------
+api/node_modules/
+api/dist/
+api/build/
+api/.next/
+
+# -----------------------------
+# UI / frontend specific (explicit, though
+# the generic patterns above already catch most)
+# -----------------------------
+ui/node_modules/
+ui/.next/
+ui/out/
+ui/.turbo/
+ui/.vercel/
+
+
+
+
+
