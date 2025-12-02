@@ -15,6 +15,12 @@ import {
 } from "lucide-react";
 import type { NavItem } from "@/types/nav";
 
+/**
+ * IT Team navigation
+ * Extra items:
+ * - System Settings
+ * - Audit Logs
+ */
 export const itNavItems: NavItem[] = [
   {
     label: "Dashboard",
@@ -37,14 +43,14 @@ export const itNavItems: NavItem[] = [
     icon: CalendarDays,
   },
   {
-    label: "Certificates",
-    href: "/it/certificates",
-    icon: FileBadge2,
-  },
-  {
     label: "Content",
     href: "/it/content",
     icon: Newspaper,
+  },
+  {
+    label: "Certificates",
+    href: "/it/certificates",
+    icon: FileBadge2,
   },
   {
     label: "Mailbox",
@@ -69,11 +75,25 @@ export const itNavItems: NavItem[] = [
   },
 ];
 
+/**
+ * Admin Team navigation
+ * Shares most items & order with IT, without system-level tools.
+ */
 export const adminNavItems: NavItem[] = [
   {
     label: "Dashboard",
     href: "/admin",
     icon: LayoutDashboard,
+  },
+  {
+    label: "Users",
+    href: "/admin/users",
+    icon: Users,
+  },
+  {
+    label: "Panels & Teams",
+    href: "/admin/panels",
+    icon: Shield,
   },
   {
     label: "Events",
@@ -91,11 +111,6 @@ export const adminNavItems: NavItem[] = [
     icon: FileBadge2,
   },
   {
-    label: "Users",
-    href: "/admin/users",
-    icon: Users,
-  },
-  {
     label: "Mailbox",
     href: "/admin/mailbox",
     icon: Inbox,
@@ -107,6 +122,9 @@ export const adminNavItems: NavItem[] = [
   },
 ];
 
+/**
+ * Member navigation
+ */
 export const memberNavItems: NavItem[] = [
   {
     label: "Dashboard",
@@ -145,6 +163,9 @@ export const memberNavItems: NavItem[] = [
   },
 ];
 
+/**
+ * Executive navigation
+ */
 export const executiveNavItems: NavItem[] = [
   {
     label: "Dashboard",

@@ -1,36 +1,56 @@
 // src/features/admin/users/AdminUsersPage.tsx
 import { PageHeader } from "@/components/layout/page-header";
+import { Button } from "@/components/ui/button";
 import {
-  SimpleTable,
-  SimpleTableRow,
-  SimpleTableCell,
-} from "@/components/layout/simple-table";
-import { StatusPill } from "@/components/ui/status-pill";
+  UsersTable,
+  type UserRecord,
+} from "@/features/users/components/UsersTable";
 
-const mockUsers = [
+const demoAdminUsers: UserRecord[] = [
   {
-    id: "user-1",
+    id: "MB-101",
     name: "Example Member",
     email: "member@austrc.com",
-    role: "Member",
-    participatedEvents: 3,
-    status: "active" as const,
+    systemRole: "USER",
+    clubRole: "Member",
+    status: "active",
+    eventsParticipated: 3,
   },
   {
-    id: "user-2",
+    id: "VL-201",
     name: "Example Volunteer",
     email: "volunteer@austrc.com",
-    role: "Volunteer",
-    participatedEvents: 5,
-    status: "active" as const,
+    systemRole: "USER",
+    clubRole: "Volunteer",
+    status: "active",
+    eventsParticipated: 5,
   },
   {
-    id: "user-3",
+    id: "AL-301",
     name: "Example Alumni",
     email: "alumni@austrc.com",
-    role: "Alumni",
-    participatedEvents: 7,
-    status: "inactive" as const,
+    systemRole: "USER",
+    clubRole: "Alumni",
+    status: "inactive",
+    eventsParticipated: 7,
+  },
+  {
+    id: "MB-102",
+    name: "New Member (pending)",
+    email: "new.member@austrc.com",
+    systemRole: "USER",
+    clubRole: "Unassigned",
+    status: "pending",
+    eventsParticipated: 0,
+  },
+  {
+    id: "MB-103",
+    name: "Banned User",
+    email: "banned.user@austrc.com",
+    systemRole: "USER",
+    clubRole: "Former Volunteer",
+    status: "banned",
+    eventsParticipated: 4,
   },
 ];
 
@@ -39,49 +59,16 @@ export function AdminUsersPage() {
     <div className="space-y-6">
       <PageHeader
         title="Users (admin view)"
-        description="See members in the context of events and content. IT has deeper control over system roles; this view is focused on operations."
+        description="See members in the context of events and content. Admins manage operations, while IT controls system access."
+        actions={
+          <Button variant="outline" disabled>
+            Add user (coming soon)
+          </Button>
+        }
       />
 
-      <SimpleTable
-        columns={[
-          "Name",
-          "Email",
-          "Role",
-          "Events participated",
-          "Status",
-        ]}
-      >
-        {mockUsers.map((user) => (
-          <SimpleTableRow key={user.id}>
-            <SimpleTableCell>
-              <div className="flex flex-col">
-                <span className="text-xs font-medium text-slate-50">
-                  {user.name}
-                </span>
-                <span className="text-[11px] text-slate-500">
-                  ID: {user.id}
-                </span>
-              </div>
-            </SimpleTableCell>
-            <SimpleTableCell className="text-slate-300">
-              {user.email}
-            </SimpleTableCell>
-            <SimpleTableCell className="text-slate-300">
-              {user.role}
-            </SimpleTableCell>
-            <SimpleTableCell align="center">
-              {user.participatedEvents}
-            </SimpleTableCell>
-            <SimpleTableCell>
-              <StatusPill
-                tone={user.status === "active" ? "success" : "warning"}
-              >
-                {user.status === "active" ? "Active" : "Inactive"}
-              </StatusPill>
-            </SimpleTableCell>
-          </SimpleTableRow>
-        ))}
-      </SimpleTable>
+      {/* Admin view: no reset-password action */}
+      <UsersTable users={demoAdminUsers} variant="admin" />
     </div>
   );
 }

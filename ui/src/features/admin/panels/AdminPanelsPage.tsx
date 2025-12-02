@@ -1,4 +1,4 @@
-// src/features/it/panels/ItPanelsPage.tsx
+// src/features/admin/panels/AdminPanelsPage.tsx
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import {
@@ -53,7 +53,7 @@ const demoTeams: TeamRecord[] = [
   },
 ];
 
-export function ItPanelsPage() {
+export function AdminPanelsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
@@ -69,7 +69,7 @@ export function ItPanelsPage() {
       <PanelsTeamsOverview
         panels={demoPanels}
         teams={demoTeams}
-        variant="it"
+        variant="admin"
       />
     </div>
   );
