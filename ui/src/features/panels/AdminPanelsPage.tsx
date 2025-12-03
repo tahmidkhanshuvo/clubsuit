@@ -1,4 +1,4 @@
-// src/features/it/panels/ItPanelsPage.tsx
+// src/features/panels/AdminPanelsPage.tsx
 "use client";
 
 import { useState } from "react";
@@ -8,11 +8,11 @@ import {
   PanelsTeamsOverview,
   type PanelRecord,
   type TeamRecord,
-} from "@/features/panels/components/PanelsTeamsOverview";
-import { PanelsStructureEditor } from "@/features/panels/components/PanelsStructureEditor";
+} from "@/features/panels/PanelsTeamsOverview";
+import { PanelsStructureEditor } from "@/features/panels/PanelStructureEditor";
 import { demoUsers } from "@/features/users/demoUsers";
 
-const demoPanels: PanelRecord[] = [
+const adminPanelsDemo: PanelRecord[] = [
   {
     id: "panel-2025",
     name: "Executive Panel 2025",
@@ -31,37 +31,50 @@ const demoPanels: PanelRecord[] = [
   },
 ];
 
-const demoTeams: TeamRecord[] = [
+const adminTeamsDemo: TeamRecord[] = [
   {
-    id: "team-rnd",
-    name: "RnD Team",
-    members: 28,
+    id: "team-events",
+    name: "Events & Operations Team",
+    members: 22,
     status: "active",
     lead: "General Secretary (GS)",
     keyRoles: [
       "General Secretary (GS)",
+      "Vice President (VP)",
       "Senior Executive (SSE)",
       "Executive (SE)",
     ],
     panelId: "panel-2025",
   },
   {
-    id: "team-msm",
-    name: "Media & Social Media Team",
+    id: "team-rnd",
+    name: "RnD Team",
     members: 18,
     status: "active",
     lead: "Vice President (VP)",
-    keyRoles: ["Vice President (VP)", "Executive (SE)", "Volunteer"],
+    keyRoles: [
+      "Vice President (VP)",
+      "Senior Executive (SSE)",
+      "Executive (SE)",
+    ],
     panelId: "panel-2025",
   },
   {
-    id: "team-ops",
-    name: "Operations & Logistics Team",
-    members: 16,
-    status: "inactive",
+    id: "team-media",
+    name: "Media & Social Media Team",
+    members: 15,
+    status: "active",
     lead: "Senior Executive (SSE)",
     keyRoles: ["Senior Executive (SSE)", "Executive (SE)", "Volunteer"],
     panelId: "panel-2024",
+  },
+  {
+    id: "team-alumni",
+    name: "Alumni Relations Team",
+    members: 10,
+    status: "inactive",
+    lead: "Executive (SE)",
+    keyRoles: ["Executive (SE)", "Volunteer"],
   },
 ];
 
@@ -71,14 +84,14 @@ const memberOptions = demoUsers.map((u) => ({
   email: u.email,
 }));
 
-export function ItPanelsPage() {
+export function AdminPanelsPage() {
   const [showEditor, setShowEditor] = useState(false);
 
   return (
     <div className="space-y-6">
       <PageHeader
         title="Panels & Teams"
-        description="IT view of AUSTRC hierarchy: executive panels and functional teams."
+        description="Admin view of how members are organized into panels and teams."
         actions={
           <Button
             variant="outline"
@@ -90,9 +103,9 @@ export function ItPanelsPage() {
       />
 
       <PanelsTeamsOverview
-        panels={demoPanels}
-        teams={demoTeams}
-        variant="it"
+        panels={adminPanelsDemo}
+        teams={adminTeamsDemo}
+        variant="admin"
         onOpenEditor={() => setShowEditor(true)}
       />
 
@@ -100,10 +113,10 @@ export function ItPanelsPage() {
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/60">
           <div className="w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-2xl border border-slate-800 bg-slate-950/95 p-4 shadow-xl">
             <PanelsStructureEditor
-              initialPanels={demoPanels}
-              initialTeams={demoTeams}
+              initialPanels={adminPanelsDemo}
+              initialTeams={adminTeamsDemo}
               availableMembers={memberOptions}
-              variant="it"
+              variant="admin"
               onClose={() => setShowEditor(false)}
             />
           </div>

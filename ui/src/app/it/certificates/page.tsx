@@ -1,6 +1,6 @@
 // src/app/it/certificates/page.tsx
 import type { Metadata } from "next";
-import { ItCertificatesPage } from "@/features/it/certificates/ItCertificatesPage";
+import { ItCertificatesPage } from "@/features/certificates/ItCertificatesPage";
 
 export const metadata: Metadata = {
   title: "IT Console – Certificates | AUSTRC",

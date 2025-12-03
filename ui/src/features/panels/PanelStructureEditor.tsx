@@ -1,4 +1,4 @@
-// src/features/panels/components/PanelsStructureEditor.tsx
+// src/features/panels/PanelStructureEditor.tsx
 "use client";
 
 import { useState, ChangeEvent, FormEvent } from "react";
@@ -8,7 +8,7 @@ import {
   TeamRecord,
   type PanelStatus,
   type TeamStatus,
-} from "@/features/panels/components/PanelsTeamsOverview";
+} from "@/features/panels/PanelsTeamsOverview";
 import { cn } from "@/lib/utils";
 import { X } from "lucide-react";
 

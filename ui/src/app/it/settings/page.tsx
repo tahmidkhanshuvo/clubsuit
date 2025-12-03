@@ -1,6 +1,6 @@
 // src/app/it/settings/page.tsx
 import type { Metadata } from "next";
-import { ItSettingsPage } from "@/features/it/settings/ItSettingsPage";
+import { ItSettingsPage } from "@/features/settings/ItSettingsPage";
 
 export const metadata: Metadata = {
   title: "IT Console – System settings | AUSTRC",

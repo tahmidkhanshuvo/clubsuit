@@ -1,6 +1,6 @@
 // src/app/admin/panels/page.tsx
 import type { Metadata } from "next";
-import { AdminPanelsPage } from "@/features/admin/panels/AdminPanelsPage";
+import { AdminPanelsPage } from "@/features/panels/AdminPanelsPage";
 
 export const metadata: Metadata = {
   title: "Admin Console – Panels & Teams | AUSTRC",

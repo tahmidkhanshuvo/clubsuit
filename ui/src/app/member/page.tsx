@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import {
   MemberDashboardPage,
   memberDashboardMetadata,
-} from "@/features/member/dashboard/MemberDashboardPage";
+} from "@/features/dashboard/MemberDashboardPage";
 
 export const metadata: Metadata = memberDashboardMetadata;
 

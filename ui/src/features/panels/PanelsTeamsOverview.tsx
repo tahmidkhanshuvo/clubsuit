@@ -1,4 +1,4 @@
-// src/features/panels/components/PanelsTeamsOverview.tsx
+// src/features/panels/PanelsTeamsOverview.tsx
 "use client";
 
 import {

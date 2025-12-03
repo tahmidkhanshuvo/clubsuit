@@ -1,6 +1,6 @@
 // src/app/it/users/page.tsx
 import type { Metadata } from "next";
-import { ItUsersPage } from "@/features/it/users/ItUsersPage";
+import { ItUsersPage } from "@/features/users/ItUsersPage";
 
 export const metadata: Metadata = {
   title: "IT Console – Users | AUSTRC",

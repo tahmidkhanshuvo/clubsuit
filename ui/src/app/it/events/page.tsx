@@ -1,6 +1,6 @@
 // src/app/it/events/page.tsx
 import type { Metadata } from "next";
-import { ItEventsPage } from "@/features/it/events/ItEventsPage";
+import { ItEventsPage } from "@/features/events/ItEventsPage";
 
 export const metadata: Metadata = {
   title: "IT Console – Events | AUSTRC",
