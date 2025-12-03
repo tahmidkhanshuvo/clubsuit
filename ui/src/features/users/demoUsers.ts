@@ -1,10 +1,22 @@
 // src/features/users/demoUsers.ts
-import type { UserRecord } from "@/features/users/components/UsersTable";
+
+export type UserStatus = "pending" | "active" | "inactive" | "banned";
+export type SystemRole = "IT" | "ADMIN" | "EXECUTIVE" | "USER";
+
+export type UserRecord = {
+  id: string;
+  name: string;
+  email: string;
+  systemRole: SystemRole;
+  clubRole: string;
+  status: UserStatus;
+  eventsParticipated?: number;
+};
 
 export type UserDetails = UserRecord & {
   memberType?: "IT" | "Admin" | "Executive" | "Member" | "Volunteer" | "Alumni";
   phone?: string;
-  joinedAt?: string;
+  joinedAt?: string; // ISO or readable
   lastLoginAt?: string;
   teams?: { id: string; name: string; role?: string }[];
   panels?: { id: string; name: string; role?: string; term?: string }[];
@@ -45,7 +57,13 @@ export const demoUsers: UserDetails[] = [
     phone: "+880 1700-000002",
     joinedAt: "2021-09-10",
     lastLoginAt: "2025-11-29T19:05:00",
-    teams: [{ id: "team-events", name: "Events & Operations Team", role: "GS" }],
+    teams: [
+      {
+        id: "team-events",
+        name: "Events & Operations Team",
+        role: "GS",
+      },
+    ],
     panels: [
       {
         id: "panel-2025",
@@ -103,7 +121,13 @@ export const demoUsers: UserDetails[] = [
     phone: "+880 1700-000005",
     joinedAt: "2022-06-01",
     lastLoginAt: "2024-09-10T17:45:00",
-    teams: [{ id: "team-events", name: "Events & Operations Team", role: "Volunteer" }],
+    teams: [
+      {
+        id: "team-events",
+        name: "Events & Operations Team",
+        role: "Volunteer",
+      },
+    ],
   },
   {
     id: "MB-003",
@@ -116,7 +140,6 @@ export const demoUsers: UserDetails[] = [
     memberType: "Member",
     phone: "+880 1700-000006",
     joinedAt: "2025-11-30",
-    lastLoginAt: undefined,
   },
   {
     id: "MB-004",
@@ -197,10 +220,13 @@ export function getDemoUserById(id: string): UserDetails | undefined {
   return demoUsers.find((u) => u.id === id);
 }
 
-export function getDemoUsersForContext(context: "it" | "admin"): UserDetails[] {
+export function getDemoUsersForContext(
+  context: "it" | "admin"
+): UserDetails[] {
   if (context === "it") {
+    // IT sees everyone
     return demoUsers;
   }
-
+  // Admin view – hide pure IT infra people if needed
   return demoUsers.filter((u) => u.systemRole !== "IT");
 }

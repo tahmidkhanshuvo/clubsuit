@@ -18,6 +18,7 @@ export type PanelRecord = {
   members: number;
   term: string;
   status: PanelStatus;
+  teamIds?: string[];
 };
 
 export type TeamStatus = "active" | "inactive";
@@ -30,31 +31,45 @@ export type TeamRecord = {
   lead?: string;
   keyRoles?: string[]; // e.g. ["GS", "VP", "SE", "SSE"]
   panelId?: string; // which panel this team belongs to (optional)
+  memberIds?: string[]; // users in this team
 };
 
 type PanelsTeamsOverviewProps = {
   panels: PanelRecord[];
   teams: TeamRecord[];
   /**
-   * "it" | "admin" – both can edit structure eventually.
+   * "it" | "admin" – both can open editor.
    */
   variant?: "it" | "admin";
+  /**
+   * Called when user clicks “Edit structure” / “Manage teams”.
+   */
+  onOpenEditor?: () => void;
 };
 
 export function PanelsTeamsOverview({
   panels,
   teams,
   variant = "it",
+  onOpenEditor,
 }: PanelsTeamsOverviewProps) {
   const activePanels = panels.filter((p) => p.status === "active").length;
   const activeTeams = teams.filter((t) => t.status === "active").length;
   const canEdit = variant === "it" || variant === "admin";
 
+  const editorButtonProps = {
+    type: "button" as const,
+    variant: "outline" as const,
+    className: "h-7 px-2 text-[11px]",
+    disabled: !onOpenEditor,
+    onClick: onOpenEditor,
+  };
+
   return (
     <div className="space-y-6">
       {/* PANELS */}
       <section className="rounded-xl border border-slate-800 bg-slate-950/60 shadow-sm overflow-hidden">
-        <div className="border-b border-slate-800 px-4 py-3 flex items-center justify-between">
+        <div className="border-b border-slate-800 px-4 py-3 flex items-center justify-between gap-2">
           <div>
             <div className="flex items-baseline gap-2">
               <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">
@@ -70,8 +85,8 @@ export function PanelsTeamsOverview({
           </div>
 
           {canEdit && (
-            <Button variant="outline" disabled className="h-7 px-2 text-[11px]">
-              Manage panels (soon)
+            <Button {...editorButtonProps}>
+              Edit structure
             </Button>
           )}
         </div>
@@ -121,15 +136,13 @@ export function PanelsTeamsOverview({
                     >
                       View
                     </Button>
-                    {canEdit && (
-                      <Button
-                        variant="outline"
-                        disabled
-                        className="h-7 px-2 text-[11px]"
-                      >
-                        Edit (soon)
-                      </Button>
-                    )}
+                    <Button
+                      variant="outline"
+                      disabled
+                      className="h-7 px-2 text-[11px]"
+                    >
+                      Edit (soon)
+                    </Button>
                   </div>
                 </SimpleTableCell>
               </SimpleTableRow>
@@ -140,7 +153,7 @@ export function PanelsTeamsOverview({
 
       {/* TEAMS */}
       <section className="rounded-xl border border-slate-800 bg-slate-950/60 shadow-sm overflow-hidden">
-        <div className="border-b border-slate-800 px-4 py-3 flex items-center justify-between">
+        <div className="border-b border-slate-800 px-4 py-3 flex items-center justify-between gap-2">
           <div>
             <div className="flex items-baseline gap-2">
               <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">
@@ -156,8 +169,8 @@ export function PanelsTeamsOverview({
           </div>
 
           {canEdit && (
-            <Button variant="outline" disabled className="h-7 px-2 text-[11px]">
-              Manage teams (soon)
+            <Button {...editorButtonProps}>
+              Manage teams
             </Button>
           )}
         </div>
@@ -176,10 +189,10 @@ export function PanelsTeamsOverview({
                     </span>
                     {(team.lead || team.keyRoles?.length) && (
                       <span className="mt-0.5 text-[11px] text-slate-500">
-                        {team.lead && <>Lead: {team.lead}</>}
+                        {team.lead && <>Lead role: {team.lead}</>}
                         {team.lead && team.keyRoles?.length ? " • " : null}
                         {team.keyRoles?.length
-                          ? `Roles: ${team.keyRoles.join(", ")}`
+                          ? `Hierarchy: ${team.keyRoles.join(", ")}`
                           : null}
                       </span>
                     )}
@@ -206,15 +219,13 @@ export function PanelsTeamsOverview({
                     >
                       View
                     </Button>
-                    {canEdit && (
-                      <Button
-                        variant="outline"
-                        disabled
-                        className="h-7 px-2 text-[11px]"
-                      >
-                        Edit (soon)
-                      </Button>
-                    )}
+                    <Button
+                      variant="outline"
+                      disabled
+                      className="h-7 px-2 text-[11px]"
+                    >
+                      Edit (soon)
+                    </Button>
                   </div>
                 </SimpleTableCell>
               </SimpleTableRow>

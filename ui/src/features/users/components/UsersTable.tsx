@@ -1,8 +1,13 @@
 // src/features/users/components/UsersTable.tsx
 "use client";
 
-import { useMemo, useState, ChangeEvent } from "react";
-import Link from "next/link";
+import {
+  useMemo,
+  useState,
+  ChangeEvent,
+  MouseEvent,
+} from "react";
+  import { useRouter } from "next/navigation";
 import {
   SimpleTable,
   SimpleTableRow,
@@ -87,6 +92,7 @@ function getRoleTone(
 }
 
 export function UsersTable({ users, variant = "it" }: UsersTableProps) {
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] =
     useState<StatusFilterValue>("all");
@@ -114,6 +120,22 @@ export function UsersTable({ users, variant = "it" }: UsersTableProps) {
 
   function handleSearchChange(e: ChangeEvent<HTMLInputElement>) {
     setSearch(e.target.value);
+  }
+
+  function handleRowClick(id: string) {
+    router.push(`${detailsBasePath}/${id}`);
+  }
+
+  function handleDetailsClick(
+    e: MouseEvent<HTMLButtonElement>,
+    id: string
+  ) {
+    e.stopPropagation();
+    router.push(`${detailsBasePath}/${id}`);
+  }
+
+  function stopRowClick(e: MouseEvent<HTMLButtonElement>) {
+    e.stopPropagation();
   }
 
   return (
@@ -184,7 +206,11 @@ export function UsersTable({ users, variant = "it" }: UsersTableProps) {
           ]}
         >
           {filteredUsers.map((user) => (
-            <SimpleTableRow key={user.id}>
+            <SimpleTableRow
+              key={user.id}
+              className="cursor-pointer transition hover:bg-slate-900/40"
+              onClick={() => handleRowClick(user.id)}
+            >
               <SimpleTableCell>
                 <div className="flex flex-col">
                   <span className="text-xs font-medium text-slate-50">
@@ -231,18 +257,14 @@ export function UsersTable({ users, variant = "it" }: UsersTableProps) {
 
               <SimpleTableCell className="text-right">
                 <div className="flex justify-end gap-2">
-                  {/* Details links to /it/users/[id] or /admin/users/[id] */}
-                  <Link
-                    href={`${detailsBasePath}/${user.id}`}
-                    className="inline-flex"
+                  {/* Details – also opens details page, but stops row click bubbling */}
+                  <Button
+                    variant="ghost"
+                    className="h-7 px-2 text-[11px]"
+                    onClick={(e) => handleDetailsClick(e, user.id)}
                   >
-                    <Button
-                      variant="ghost"
-                      className="h-7 px-2 text-[11px]"
-                    >
-                      Details
-                    </Button>
-                  </Link>
+                    Details
+                  </Button>
 
                   {/* Verify / Ban / Unban – wired later to backend */}
                   {user.status === "pending" && (
@@ -250,6 +272,7 @@ export function UsersTable({ users, variant = "it" }: UsersTableProps) {
                       variant="outline"
                       disabled
                       className="h-7 px-2 text-[11px]"
+                      onClick={stopRowClick}
                     >
                       Verify (soon)
                     </Button>
@@ -260,6 +283,7 @@ export function UsersTable({ users, variant = "it" }: UsersTableProps) {
                       variant="outline"
                       disabled
                       className="h-7 px-2 text-[11px]"
+                      onClick={stopRowClick}
                     >
                       Ban (soon)
                     </Button>
@@ -270,17 +294,19 @@ export function UsersTable({ users, variant = "it" }: UsersTableProps) {
                       variant="outline"
                       disabled
                       className="h-7 px-2 text-[11px]"
+                      onClick={stopRowClick}
                     >
                       Unban (soon)
                     </Button>
                   )}
 
-                  {/* IT-only */}
+                  {/* IT-only: Reset password */}
                   {showResetPassword && (
                     <Button
                       variant="ghost"
                       disabled
                       className="h-7 px-2 text-[11px] text-slate-400 hover:text-slate-300"
+                      onClick={stopRowClick}
                     >
                       Reset password
                     </Button>

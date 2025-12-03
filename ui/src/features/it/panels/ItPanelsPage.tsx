@@ -1,4 +1,7 @@
 // src/features/it/panels/ItPanelsPage.tsx
+"use client";
+
+import { useState } from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import {
@@ -7,6 +10,7 @@ import {
   type TeamRecord,
 } from "@/features/panels/components/PanelsTeamsOverview";
 import { PanelsStructureEditor } from "@/features/panels/components/PanelsStructureEditor";
+import { demoUsers } from "@/features/users/demoUsers";
 
 const demoPanels: PanelRecord[] = [
   {
@@ -34,7 +38,11 @@ const demoTeams: TeamRecord[] = [
     members: 28,
     status: "active",
     lead: "General Secretary (GS)",
-    keyRoles: ["General Secretary (GS)", "Senior Executive (SSE)", "Executive (SE)"],
+    keyRoles: [
+      "General Secretary (GS)",
+      "Senior Executive (SSE)",
+      "Executive (SE)",
+    ],
     panelId: "panel-2025",
   },
   {
@@ -57,15 +65,26 @@ const demoTeams: TeamRecord[] = [
   },
 ];
 
+const memberOptions = demoUsers.map((u) => ({
+  id: u.id,
+  name: u.name,
+  email: u.email,
+}));
+
 export function ItPanelsPage() {
+  const [showEditor, setShowEditor] = useState(false);
+
   return (
     <div className="space-y-6">
       <PageHeader
         title="Panels & Teams"
-        description="Keep the AUSTRC hierarchy clean: executive panels and functional teams."
+        description="IT view of AUSTRC hierarchy: executive panels and functional teams."
         actions={
-          <Button variant="outline" disabled>
-            Backend integration (soon)
+          <Button
+            variant="outline"
+            onClick={() => setShowEditor((prev) => !prev)}
+          >
+            {showEditor ? "Hide editor" : "Open editor"}
           </Button>
         }
       />
@@ -74,13 +93,22 @@ export function ItPanelsPage() {
         panels={demoPanels}
         teams={demoTeams}
         variant="it"
+        onOpenEditor={() => setShowEditor(true)}
       />
 
-      <PanelsStructureEditor
-        initialPanels={demoPanels}
-        initialTeams={demoTeams}
-        variant="it"
-      />
+      {showEditor && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/60">
+          <div className="w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-2xl border border-slate-800 bg-slate-950/95 p-4 shadow-xl">
+            <PanelsStructureEditor
+              initialPanels={demoPanels}
+              initialTeams={demoTeams}
+              availableMembers={memberOptions}
+              variant="it"
+              onClose={() => setShowEditor(false)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

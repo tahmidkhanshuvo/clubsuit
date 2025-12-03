@@ -10,6 +10,7 @@ import {
   type TeamStatus,
 } from "@/features/panels/components/PanelsTeamsOverview";
 import { cn } from "@/lib/utils";
+import { X } from "lucide-react";
 
 const INTERNAL_ROLES = [
   { code: "PRES", label: "President" },
@@ -22,10 +23,25 @@ const INTERNAL_ROLES = [
   { code: "VOL", label: "Volunteer" },
 ];
 
+type MemberOption = {
+  id: string;
+  name: string;
+  email: string;
+};
+
 type PanelsStructureEditorProps = {
   initialPanels: PanelRecord[];
   initialTeams: TeamRecord[];
+  /**
+   * List of users that can be added to teams.
+   * This is just for UI; backend will replace this later.
+   */
+  availableMembers?: MemberOption[];
   variant?: "it" | "admin";
+  /**
+   * Called when “Close editor” is pressed.
+   */
+  onClose?: () => void;
 };
 
 type PanelFormState = {
@@ -33,15 +49,15 @@ type PanelFormState = {
   role: string;
   term: string;
   status: PanelStatus;
+  teamIds: string[];
 };
 
 type TeamFormState = {
   name: string;
-  panelId: string;
-  members: string;
   status: TeamStatus;
   leadRoleCode: string;
   keyRoleCodes: string[];
+  memberIds: string[];
 };
 
 function slugify(value: string) {
@@ -55,7 +71,9 @@ function slugify(value: string) {
 export function PanelsStructureEditor({
   initialPanels,
   initialTeams,
+  availableMembers,
   variant = "it",
+  onClose,
 }: PanelsStructureEditorProps) {
   const [panels, setPanels] = useState<PanelRecord[]>(initialPanels);
   const [teams, setTeams] = useState<TeamRecord[]>(initialTeams);
@@ -65,18 +83,23 @@ export function PanelsStructureEditor({
     role: "Executive",
     term: "",
     status: "active",
+    teamIds: [],
   });
 
   const [teamForm, setTeamForm] = useState<TeamFormState>({
     name: "",
-    panelId: initialPanels[0]?.id ?? "",
-    members: "",
     status: "active",
     leadRoleCode: "GS",
     keyRoleCodes: ["GS", "VP", "SSE", "SE"],
+    memberIds: [],
   });
 
+  const [memberQuery, setMemberQuery] = useState("");
+
   const canEdit = variant === "it" || variant === "admin";
+  if (!canEdit) return null;
+
+  // --- helpers
 
   function handlePanelInputChange(
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -85,11 +108,29 @@ export function PanelsStructureEditor({
     setPanelForm((prev) => ({ ...prev, [name]: value }));
   }
 
+  function handlePanelTeamToggle(teamId: string) {
+    setPanelForm((prev) => {
+      const exists = prev.teamIds.includes(teamId);
+      return {
+        ...prev,
+        teamIds: exists
+          ? prev.teamIds.filter((id) => id !== teamId)
+          : [...prev.teamIds, teamId],
+      };
+    });
+  }
+
   function handleTeamInputChange(
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) {
     const { name, value } = e.target;
-    setTeamForm((prev) => ({ ...prev, [name]: value }));
+    if (name === "name") {
+      setTeamForm((prev) => ({ ...prev, name: value }));
+    } else if (name === "status") {
+      setTeamForm((prev) => ({ ...prev, status: value as TeamStatus }));
+    } else if (name === "leadRoleCode") {
+      setTeamForm((prev) => ({ ...prev, leadRoleCode: value }));
+    }
   }
 
   function handleRoleToggle(roleCode: string) {
@@ -104,26 +145,90 @@ export function PanelsStructureEditor({
     });
   }
 
+  function handleMemberQueryChange(e: ChangeEvent<HTMLInputElement>) {
+    setMemberQuery(e.target.value);
+  }
+
+  function handleAddMember(memberId: string) {
+    setTeamForm((prev) => {
+      if (prev.memberIds.includes(memberId)) return prev;
+      return { ...prev, memberIds: [...prev.memberIds, memberId] };
+    });
+    setMemberQuery("");
+  }
+
+  function handleRemoveMember(memberId: string) {
+    setTeamForm((prev) => ({
+      ...prev,
+      memberIds: prev.memberIds.filter((id) => id !== memberId),
+    }));
+  }
+
+  function getMemberLabel(memberId: string) {
+    const match = availableMembers?.find((m) => m.id === memberId);
+    if (!match) return memberId;
+    return `${match.name}`;
+  }
+
+  const trimmedQuery = memberQuery.trim().toLowerCase();
+  const memberSuggestions =
+    trimmedQuery && availableMembers
+      ? availableMembers
+          .filter(
+            (m) =>
+              !teamForm.memberIds.includes(m.id) &&
+              (m.name.toLowerCase().includes(trimmedQuery) ||
+                m.email.toLowerCase().includes(trimmedQuery) ||
+                m.id.toLowerCase().includes(trimmedQuery))
+          )
+          .slice(0, 6)
+      : [];
+
   function handlePanelSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!panelForm.name.trim()) return;
 
-    const id = `panel-${panelForm.term || "custom"}-${slugify(panelForm.name)}`;
+    const id = `panel-${panelForm.term || "custom"}-${slugify(
+      panelForm.name
+    )}`;
+
+    // Teams included in this panel
+    const teamsInPanel = teams.filter((t) =>
+      panelForm.teamIds.includes(t.id)
+    );
+    const totalMembers = teamsInPanel.reduce(
+      (sum, team) => sum + (team.members || 0),
+      0
+    );
+
     const newPanel: PanelRecord = {
       id,
       name: panelForm.name.trim(),
       role: panelForm.role || "Executive",
-      members: 0,
+      members: totalMembers,
       term: panelForm.term || "Custom",
       status: panelForm.status,
+      teamIds: [...panelForm.teamIds],
     };
 
     setPanels((prev) => [...prev, newPanel]);
-    // Reset name/term only
+
+    // attach teams to this panel (via panelId field)
+    if (panelForm.teamIds.length > 0) {
+      setTeams((prev) =>
+        prev.map((team) =>
+          panelForm.teamIds.includes(team.id)
+            ? { ...team, panelId: id }
+            : team
+        )
+      );
+    }
+
     setPanelForm((prev) => ({
       ...prev,
       name: "",
       term: "",
+      teamIds: [],
     }));
   }
 
@@ -140,22 +245,26 @@ export function PanelsStructureEditor({
     );
 
     const id = `team-${slugify(teamForm.name)}-${teams.length + 1}`;
+    const membersCount = teamForm.memberIds.length;
+
     const newTeam: TeamRecord = {
       id,
       name: teamForm.name.trim(),
-      members: Number(teamForm.members || 0),
       status: teamForm.status,
+      members: membersCount,
       lead: leadRole ? leadRole.label : undefined,
       keyRoles: roles,
-      panelId: teamForm.panelId || undefined,
+      memberIds: [...teamForm.memberIds],
     };
 
     setTeams((prev) => [...prev, newTeam]);
+
     setTeamForm((prev) => ({
       ...prev,
       name: "",
-      members: "",
+      memberIds: [],
     }));
+    setMemberQuery("");
   }
 
   // Group teams by panel for preview
@@ -166,28 +275,39 @@ export function PanelsStructureEditor({
 
   const looseTeams = teams.filter((t) => !t.panelId);
 
-  if (!canEdit) return null;
-
   return (
-    <section className="space-y-4">
-      <div>
-        <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">
-          Structure editor (demo)
-        </h2>
-        <p className="mt-1 text-[11px] text-slate-500">
-          Form panels and teams, and assign internal roles like GS, VP, SE, SSE.
-          This UI uses local state only – backend integration can later replace
-          the submit handlers.
-        </p>
+    <div className="space-y-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">
+            Structure editor (demo)
+          </h2>
+          <p className="mt-1 text-[11px] text-slate-500">
+            Form panels from teams, and build teams by adding members via
+            search. Roles (IT/Admin/etc.) are assigned in the Users tab – this
+            editor only manages club structure (GS, VP, SE, SSE, etc.).
+          </p>
+        </div>
+
+        {onClose && (
+          <Button
+            type="button"
+            variant="ghost"
+            className="h-7 px-2 text-[11px] text-slate-400 hover:text-slate-100"
+            onClick={onClose}
+          >
+            Close editor
+          </Button>
+        )}
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,2.3fr),minmax(0,2.2fr)]">
-        {/* Forms */}
+        {/* Forms column */}
         <div className="space-y-4">
-          {/* Panel form */}
-          <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
+          {/* Panel form – create panel by selecting TEAMS (no individual users) */}
+          <div className="rounded-xl border border-slate-800 bg-slate-950 p-4">
             <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
-              Add panel
+              New panel
             </h3>
             <form
               onSubmit={handlePanelSubmit}
@@ -203,6 +323,7 @@ export function PanelsStructureEditor({
                   className="w-full rounded-md border border-slate-800 bg-slate-950 px-2 py-1.5 text-[11px] text-slate-100 placeholder:text-slate-600 focus:outline-none focus:ring-1 focus:ring-slate-500"
                 />
               </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <label className="text-slate-400">Role</label>
@@ -215,7 +336,7 @@ export function PanelsStructureEditor({
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-slate-400">Term/year</label>
+                  <label className="text-slate-400">Term / year</label>
                   <input
                     name="term"
                     value={panelForm.term}
@@ -225,6 +346,7 @@ export function PanelsStructureEditor({
                   />
                 </div>
               </div>
+
               <div className="space-y-1">
                 <label className="text-slate-400">Status</label>
                 <select
@@ -237,6 +359,45 @@ export function PanelsStructureEditor({
                   <option value="archived">Archived</option>
                 </select>
               </div>
+
+              <div className="space-y-1">
+                <label className="text-slate-400">Teams in this panel</label>
+                <div className="mt-1 max-h-40 overflow-y-auto rounded-md border border-slate-800 bg-slate-950 px-2 py-1.5 space-y-1.5">
+                  {teams.length === 0 ? (
+                    <p className="text-[10px] text-slate-500">
+                      Create teams first, then attach them to a panel.
+                    </p>
+                  ) : (
+                    teams.map((team) => {
+                      const checked = panelForm.teamIds.includes(team.id);
+                      return (
+                        <label
+                          key={team.id}
+                          className="flex items-center gap-2 text-[11px]"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={() => handlePanelTeamToggle(team.id)}
+                            className="h-3 w-3 rounded border border-slate-600 bg-slate-950"
+                          />
+                          <span className="text-slate-100">
+                            {team.name}
+                          </span>
+                          <span className="text-[10px] text-slate-500">
+                            • {team.members} members
+                          </span>
+                        </label>
+                      );
+                    })
+                  )}
+                </div>
+                <p className="text-[10px] text-slate-500">
+                  Panels are built only from teams. There is no option to add
+                  individual users directly to a panel.
+                </p>
+              </div>
+
               <Button
                 type="submit"
                 variant="outline"
@@ -247,10 +408,10 @@ export function PanelsStructureEditor({
             </form>
           </div>
 
-          {/* Team form */}
-          <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
+          {/* Team form – create team, pick roles, assign members via search */}
+          <div className="rounded-xl border border-slate-800 bg-slate-950 p-4">
             <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
-              Add team
+              New team
             </h3>
             <form
               onSubmit={handleTeamSubmit}
@@ -265,35 +426,6 @@ export function PanelsStructureEditor({
                   placeholder="e.g. RnD Team"
                   className="w-full rounded-md border border-slate-800 bg-slate-950 px-2 py-1.5 text-[11px] text-slate-100 placeholder:text-slate-600 focus:outline-none focus:ring-1 focus:ring-slate-500"
                 />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-slate-400">Attach to panel</label>
-                  <select
-                    name="panelId"
-                    value={teamForm.panelId}
-                    onChange={handleTeamInputChange}
-                    className="w-full rounded-md border border-slate-800 bg-slate-950 px-2 py-1.5 text-[11px] text-slate-100 focus:outline-none focus:ring-1 focus:ring-slate-500"
-                  >
-                    <option value="">No panel</option>
-                    {panels.map((panel) => (
-                      <option key={panel.id} value={panel.id}>
-                        {panel.name} ({panel.term})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="space-y-1">
-                  <label className="text-slate-400">Members (approx.)</label>
-                  <input
-                    name="members"
-                    value={teamForm.members}
-                    onChange={handleTeamInputChange}
-                    placeholder="18"
-                    className="w-full rounded-md border border-slate-800 bg-slate-950 px-2 py-1.5 text-[11px] text-slate-100 placeholder:text-slate-600 focus:outline-none focus:ring-1 focus:ring-slate-500"
-                  />
-                </div>
               </div>
 
               <div className="space-y-1">
@@ -351,6 +483,66 @@ export function PanelsStructureEditor({
                 </div>
               </div>
 
+              <div className="space-y-1">
+                <label className="text-slate-400">
+                  Members (search by name, add as tags)
+                </label>
+                {availableMembers ? (
+                  <>
+                    <div className="flex items-center gap-2 rounded-md border border-slate-800 bg-slate-950 px-2 py-1.5">
+                      <input
+                        value={memberQuery}
+                        onChange={handleMemberQueryChange}
+                        placeholder="Type a name or email"
+                        className="w-full border-0 bg-transparent text-[11px] text-slate-100 placeholder:text-slate-600 focus:outline-none"
+                      />
+                    </div>
+                    {memberSuggestions.length > 0 && (
+                      <div className="mt-1 max-h-32 overflow-y-auto rounded-md border border-slate-800 bg-slate-950 px-2 py-1.5 space-y-1">
+                        {memberSuggestions.map((m) => (
+                          <button
+                            key={m.id}
+                            type="button"
+                            onClick={() => handleAddMember(m.id)}
+                            className="flex w-full items-center justify-between rounded-md px-1.5 py-1 text-left text-[11px] text-slate-100 hover:bg-slate-900"
+                          >
+                            <span>{m.name}</span>
+                            <span className="text-[10px] text-slate-500">
+                              {m.email}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {teamForm.memberIds.length === 0 ? (
+                        <span className="text-[10px] text-slate-500">
+                          No members added yet.
+                        </span>
+                      ) : (
+                        teamForm.memberIds.map((id) => (
+                          <button
+                            key={id}
+                            type="button"
+                            onClick={() => handleRemoveMember(id)}
+                            className="inline-flex items-center gap-1 rounded-full border border-slate-700 bg-slate-900 px-2 py-0.5 text-[10px] text-slate-100"
+                          >
+                            <span>{getMemberLabel(id)}</span>
+                            <X className="h-3 w-3 text-slate-400" />
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-[10px] text-slate-500">
+                    Member search is demo-only. When backend is ready, this will
+                    query users by name/email and add them as tags.
+                  </p>
+                )}
+              </div>
+
               <Button
                 type="submit"
                 variant="outline"
@@ -362,14 +554,14 @@ export function PanelsStructureEditor({
           </div>
         </div>
 
-        {/* Preview */}
-        <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-4 space-y-3">
+        {/* Preview column */}
+        <div className="rounded-xl border border-slate-800 bg-slate-950 p-4 space-y-3">
           <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
             Preview structure
           </h3>
           <p className="text-[11px] text-slate-500">
-            How panels and teams look right now. In the real system this would
-            mirror the AUSTRC hierarchy from the database.
+            This view mirrors how panels and teams are currently structured.
+            Panels are made of teams; teams contain members and internal roles.
           </p>
 
           <div className="space-y-3 text-[11px] text-slate-300">
@@ -408,12 +600,12 @@ export function PanelsStructureEditor({
                         </div>
                         {team.lead && (
                           <div className="mt-0.5 text-[10px] text-slate-400">
-                            Lead: {team.lead}
+                            Lead role: {team.lead}
                           </div>
                         )}
                         {team.keyRoles && team.keyRoles.length > 0 && (
                           <div className="mt-0.5 text-[10px] text-slate-500">
-                            Roles: {team.keyRoles.join(", ")}
+                            Hierarchy: {team.keyRoles.join(", ")}
                           </div>
                         )}
                       </div>
@@ -448,12 +640,12 @@ export function PanelsStructureEditor({
                       </div>
                       {team.lead && (
                         <div className="mt-0.5 text-[10px] text-slate-400">
-                          Lead: {team.lead}
+                          Lead role: {team.lead}
                         </div>
                       )}
                       {team.keyRoles && team.keyRoles.length > 0 && (
                         <div className="mt-0.5 text-[10px] text-slate-500">
-                          Roles: {team.keyRoles.join(", ")}
+                          Hierarchy: {team.keyRoles.join(", ")}
                         </div>
                       )}
                     </div>
@@ -464,6 +656,6 @@ export function PanelsStructureEditor({
           </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 }

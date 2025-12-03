@@ -1,4 +1,7 @@
 // src/features/admin/panels/AdminPanelsPage.tsx
+"use client";
+
+import { useState } from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import {
@@ -7,6 +10,7 @@ import {
   type TeamRecord,
 } from "@/features/panels/components/PanelsTeamsOverview";
 import { PanelsStructureEditor } from "@/features/panels/components/PanelsStructureEditor";
+import { demoUsers } from "@/features/users/demoUsers";
 
 const adminPanelsDemo: PanelRecord[] = [
   {
@@ -34,7 +38,12 @@ const adminTeamsDemo: TeamRecord[] = [
     members: 22,
     status: "active",
     lead: "General Secretary (GS)",
-    keyRoles: ["General Secretary (GS)", "Vice President (VP)", "Senior Executive (SSE)", "Executive (SE)"],
+    keyRoles: [
+      "General Secretary (GS)",
+      "Vice President (VP)",
+      "Senior Executive (SSE)",
+      "Executive (SE)",
+    ],
     panelId: "panel-2025",
   },
   {
@@ -43,7 +52,11 @@ const adminTeamsDemo: TeamRecord[] = [
     members: 18,
     status: "active",
     lead: "Vice President (VP)",
-    keyRoles: ["Vice President (VP)", "Senior Executive (SSE)", "Executive (SE)"],
+    keyRoles: [
+      "Vice President (VP)",
+      "Senior Executive (SSE)",
+      "Executive (SE)",
+    ],
     panelId: "panel-2025",
   },
   {
@@ -65,15 +78,26 @@ const adminTeamsDemo: TeamRecord[] = [
   },
 ];
 
+const memberOptions = demoUsers.map((u) => ({
+  id: u.id,
+  name: u.name,
+  email: u.email,
+}));
+
 export function AdminPanelsPage() {
+  const [showEditor, setShowEditor] = useState(false);
+
   return (
     <div className="space-y-6">
       <PageHeader
         title="Panels & Teams"
-        description="See how members are organized into panels and teams for club operations."
+        description="Admin view of how members are organized into panels and teams."
         actions={
-          <Button variant="outline" disabled>
-            Backend integration (soon)
+          <Button
+            variant="outline"
+            onClick={() => setShowEditor((prev) => !prev)}
+          >
+            {showEditor ? "Hide editor" : "Open editor"}
           </Button>
         }
       />
@@ -82,13 +106,22 @@ export function AdminPanelsPage() {
         panels={adminPanelsDemo}
         teams={adminTeamsDemo}
         variant="admin"
+        onOpenEditor={() => setShowEditor(true)}
       />
 
-      <PanelsStructureEditor
-        initialPanels={adminPanelsDemo}
-        initialTeams={adminTeamsDemo}
-        variant="admin"
-      />
+      {showEditor && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/60">
+          <div className="w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-2xl border border-slate-800 bg-slate-950/95 p-4 shadow-xl">
+            <PanelsStructureEditor
+              initialPanels={adminPanelsDemo}
+              initialTeams={adminTeamsDemo}
+              availableMembers={memberOptions}
+              variant="admin"
+              onClose={() => setShowEditor(false)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
